@@ -1,6 +1,5 @@
 "use client"
 
-import { motion } from "framer-motion"
 import type { GlassConfig, ComponentConfig } from "@/app/page"
 import { ProfileCard } from "@/components/glass-components/profile-card"
 import { ProductCard } from "@/components/glass-components/product-card"
@@ -51,14 +50,7 @@ export function PreviewArea({ glassConfig, componentConfig }: PreviewAreaProps) 
       >
         <div className="absolute inset-0 bg-black/20" />
         <div className="relative z-10 h-full flex items-center justify-center p-8">
-          <motion.div
-            key={`${componentConfig.type}-${JSON.stringify(glassConfig)}`}
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.3 }}
-          >
-            {renderComponent()}
-          </motion.div>
+          <div key={`${componentConfig.type}-${JSON.stringify(glassConfig)}`}>{renderComponent()}</div>
         </div>
       </div>
     </div>

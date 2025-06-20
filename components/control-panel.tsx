@@ -61,7 +61,7 @@ export function ControlPanel({ glassConfig, setGlassConfig }: ControlPanelProps)
   }
 
   return (
-    <div className="p-6 space-y-6 overflow-auto h-full">
+    <div className="p-6 space-y-6 overflow-auto h-full flex flex-col">
       <div>
         <h3 className="text-lg font-semibold mb-4">Glass Effects</h3>
 
