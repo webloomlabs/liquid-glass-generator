@@ -45,18 +45,39 @@ const presets = {
 }
 
 export function ControlPanel({ glassConfig, setGlassConfig }: ControlPanelProps) {
+  // Helper function to convert RGBA string to hex color
+  const rgbaToHex = (rgba: string): string => {
+    const match = rgba.match(/rgba?$$(\d+),\s*(\d+),\s*(\d+)(?:,\s*[\d.]+)?$$/)
+    if (match) {
+      const [, r, g, b] = match
+      const toHex = (n: string) => Number.parseInt(n).toString(16).padStart(2, "0")
+      return `#${toHex(r)}${toHex(g)}${toHex(b)}`
+    }
+    return "#000000"
+  }
+
+  // Helper function to convert hex to RGBA with opacity
+  const hexToRgba = (hex: string, opacity: number): string => {
+    const r = Number.parseInt(hex.slice(1, 3), 16)
+    const g = Number.parseInt(hex.slice(3, 5), 16)
+    const b = Number.parseInt(hex.slice(5, 7), 16)
+    return `rgba(${r}, ${g}, ${b}, ${opacity / 100})`
+  }
+
+  // Helper function to update RGBA opacity while keeping RGB values
+  const updateRgbaOpacity = (rgba: string, opacity: number): string => {
+    const match = rgba.match(/rgba?$$(\d+),\s*(\d+),\s*(\d+)(?:,\s*[\d.]+)?$$/)
+    if (match) {
+      const [, r, g, b] = match
+      return `rgba(${r}, ${g}, ${b}, ${opacity / 100})`
+    }
+    return rgba
+  }
+
   const updateConfig = (key: keyof GlassConfig, value: any) => {
     if (key === "opacity") {
-      // When opacity changes, update the backgroundColor to reflect the new opacity
-      const currentBg = glassConfig.backgroundColor
-      let newBackgroundColor = currentBg
-
-      // Parse RGBA string and update opacity
-      const rgbaMatch = currentBg.match(/rgba?$$(\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?$$/)
-      if (rgbaMatch) {
-        const [, r, g, b] = rgbaMatch
-        newBackgroundColor = `rgba(${r}, ${g}, ${b}, ${value / 100})`
-      }
+      // Update backgroundColor with new opacity, keeping RGB values
+      const newBackgroundColor = updateRgbaOpacity(glassConfig.backgroundColor, value)
 
       setGlassConfig({
         ...glassConfig,
@@ -69,6 +90,30 @@ export function ControlPanel({ glassConfig, setGlassConfig }: ControlPanelProps)
         [key]: value,
       })
     }
+  }
+
+  const updateGlassColor = (hex: string) => {
+    const newBackgroundColor = hexToRgba(hex, glassConfig.opacity)
+    setGlassConfig({
+      ...glassConfig,
+      backgroundColor: newBackgroundColor,
+    })
+  }
+
+  const updateBorderColor = (hex: string) => {
+    // Extract current alpha from border color
+    const match = glassConfig.borderColor.match(/rgba?$$(\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?$$/)
+    const currentAlpha = match && match[4] ? Number.parseFloat(match[4]) : 0.125
+
+    const r = Number.parseInt(hex.slice(1, 3), 16)
+    const g = Number.parseInt(hex.slice(3, 5), 16)
+    const b = Number.parseInt(hex.slice(5, 7), 16)
+    const newBorderColor = `rgba(${r}, ${g}, ${b}, ${currentAlpha})`
+
+    setGlassConfig({
+      ...glassConfig,
+      borderColor: newBorderColor,
+    })
   }
 
   const applyPreset = (presetName: keyof typeof presets) => {
@@ -206,13 +251,14 @@ export function ControlPanel({ glassConfig, setGlassConfig }: ControlPanelProps)
             />
           </div>
 
-          {/* Background Color */}
+          {/* Glass Color */}
           <div>
             <Label>Glass Color</Label>
             <Input
-              value={glassConfig.backgroundColor}
-              onChange={(e) => updateConfig("backgroundColor", e.target.value)}
-              placeholder="rgba(17, 25, 40, 0.75)"
+              type="color"
+              value={rgbaToHex(glassConfig.backgroundColor)}
+              onChange={(e) => updateGlassColor(e.target.value)}
+              className="mt-2"
             />
           </div>
 
@@ -220,9 +266,10 @@ export function ControlPanel({ glassConfig, setGlassConfig }: ControlPanelProps)
           <div>
             <Label>Border Color</Label>
             <Input
-              value={glassConfig.borderColor}
-              onChange={(e) => updateConfig("borderColor", e.target.value)}
-              placeholder="rgba(255, 255, 255, 0.125)"
+              type="color"
+              value={rgbaToHex(glassConfig.borderColor)}
+              onChange={(e) => updateBorderColor(e.target.value)}
+              className="mt-2"
             />
           </div>
         </div>
