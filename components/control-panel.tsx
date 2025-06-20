@@ -46,10 +46,29 @@ const presets = {
 
 export function ControlPanel({ glassConfig, setGlassConfig }: ControlPanelProps) {
   const updateConfig = (key: keyof GlassConfig, value: any) => {
-    setGlassConfig({
-      ...glassConfig,
-      [key]: value,
-    })
+    if (key === "opacity") {
+      // When opacity changes, update the backgroundColor to reflect the new opacity
+      const currentBg = glassConfig.backgroundColor
+      let newBackgroundColor = currentBg
+
+      // Parse RGBA string and update opacity
+      const rgbaMatch = currentBg.match(/rgba?$$(\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?$$/)
+      if (rgbaMatch) {
+        const [, r, g, b] = rgbaMatch
+        newBackgroundColor = `rgba(${r}, ${g}, ${b}, ${value / 100})`
+      }
+
+      setGlassConfig({
+        ...glassConfig,
+        [key]: value,
+        backgroundColor: newBackgroundColor,
+      })
+    } else {
+      setGlassConfig({
+        ...glassConfig,
+        [key]: value,
+      })
+    }
   }
 
   const applyPreset = (presetName: keyof typeof presets) => {
