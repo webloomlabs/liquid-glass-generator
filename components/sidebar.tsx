@@ -28,7 +28,7 @@ export function Sidebar({ componentConfig, setComponentConfig, glassConfig, setG
       <Tabs defaultValue="glass-effects" className="flex-1 flex flex-col">
         <div className="px-6 pt-6 pb-4 border-b border-border">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="component-settings">Component Settings</TabsTrigger>
+            <TabsTrigger value="component-settings">Component</TabsTrigger>
             <TabsTrigger value="glass-effects">Glass Effects</TabsTrigger>
           </TabsList>
         </div>
